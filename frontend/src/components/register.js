@@ -33,6 +33,7 @@ function Register() {
 				<div>
 					<label>Username:</label>
 					<input
+						id="username"
 						type="text"
 						value={username}
 						onChange={(e) => setUsername(e.target.value)}
@@ -41,6 +42,7 @@ function Register() {
 				<div>
 					<label>Password:</label>
 					<input
+						id="password"
 						type="password"
 						value={password}
 						onChange={(e) => setPassword(e.target.value)}

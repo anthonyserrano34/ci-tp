@@ -1,10 +1,11 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const sqlite3 = require("sqlite3").verbose();
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-require("dotenv").config();
+import express from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
+import sqlite3 from "sqlite3";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { config } from "dotenv";
+config();
 
 const app = express();
 const db = new sqlite3.Database(":memory:");
@@ -82,3 +83,5 @@ app.get("/api/ping", (req, res) => {
 app.listen(PORT, () => {
 	console.log(`Server is running on port ${PORT}`);
 });
+
+export default app;
