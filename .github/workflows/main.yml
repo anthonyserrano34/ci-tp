@@ -28,15 +28,21 @@ jobs:
   
       - name: Run backend tests
         working-directory: backend
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: npm test
 
       - name: Start backend and frontend
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
           npm start:backend &
           npm start &
           sleep 30
 
       - name: Run Cypress tests
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
           cd frontend
           npx cypress run
