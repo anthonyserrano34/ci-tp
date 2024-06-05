@@ -7,10 +7,6 @@ chai.use(chaiHttp);
 describe("Authentication API Workflow", () => {
 	let user_id;
 
-	after(function (done) {
-        server.close(done);
-    });
-
 	it("should register a user", (done) => {
 		chai.request(server)
 			.post("/api/register")
