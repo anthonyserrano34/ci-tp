@@ -1,4 +1,4 @@
-name: main
+name: Main CI Pipeline
 
 on:
   push:
@@ -6,53 +6,85 @@ on:
       - main
 
 jobs:
-  build:
+  install-dependencies:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: '14'
+          cache: 'npm'
 
       - name: Install frontend dependencies
         working-directory: frontend
-        run: npm install
+        run: npm ci
 
       - name: Install backend dependencies
         working-directory: backend
-        run: npm install
-  
+        run: npm ci
+
+  backend-tests:
+    runs-on: ubuntu-latest
+    needs: install-dependencies
+
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+          cache: 'npm'
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
       - name: Run backend tests
         working-directory: backend
-        env:
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: npm test
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    needs: install-dependencies
+
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+          cache: 'npm'
 
       - name: Start backend
         working-directory: backend
-        env:
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: npm start &
+        id: backend
 
       - name: Start frontend
         working-directory: frontend
-        env:
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: npm start &
+        id: frontend
 
       - name: Wait for services to start
-        run: sleep 30
+        run: npx wait-on http://localhost:3000 && npx wait-on http://localhost:4000
 
       - name: Run Cypress tests
-        env:
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        run: |
-          cd frontend
-          npx cypress run
+        working-directory: frontend
+        run: npx cypress run
 
       - name: Stop backend and frontend
         run: |
